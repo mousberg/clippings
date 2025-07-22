@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation
+README.md
+*.md
+
+# Generated files
+*.pdf
+*.json
+!example_report_data.json
+!requirements.txt
+
+# Example scripts
+example_rss_usage.py
+
+# Logs
+*.log
+logs/
+
+# Cloud Build
+cloudbuild.yaml
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Deployment scripts  
+deploy.sh
+
+# Temporary files
+*.tmp
+*.temp
+*~ 

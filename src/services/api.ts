@@ -64,6 +64,8 @@ export class ApiService {
         filename: `${clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`,
         language: 'en-US',
         country: includeInternational ? 'US' : 'GB',
+        // Note: Backend developer needs to set GOOGLE_API_KEY environment variable
+        // or we need to pass google_api_key parameter here
       }),
     });
 

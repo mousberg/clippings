@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+reportlab
+pydantic
+python-multipart
+langchain
+langchain-google-genai
+feedparser
+requests
