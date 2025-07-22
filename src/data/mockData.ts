@@ -110,22 +110,30 @@ export const mockDailyReport: DailyReport = {
 };
 
 // Helper function to generate sample data for different clients
-export function generateMockReportForClient(clientId: string): DailyReport {
+export function generateMockReportForClient(clientId: string, includeInternational: boolean = false): DailyReport {
   const client = mockClients.find(c => c.id === clientId);
   if (!client) throw new Error(`Client ${clientId} not found`);
 
+  // Define outlet pools based on coverage scope
+  const ukOutlets = ["BBC", "The Guardian", "The Times", "Sky News", "Independent"];
+  const internationalOutlets = ["CNN", "Reuters", "AP", "Bloomberg", "Wall Street Journal", "New York Times", "France24"];
+  const outlets = includeInternational ? [...ukOutlets, ...internationalOutlets] : ukOutlets;
+
+  // Generate more articles for international coverage
+  const articleCount = includeInternational ? Math.floor(Math.random() * 15) + 8 : Math.floor(Math.random() * 10) + 3;
+
   // Generate some sample articles with random data
-  const sampleArticles: Article[] = Array.from({ length: Math.floor(Math.random() * 10) + 3 }, (_, i) => ({
-    id: i + 1000,
-    title: `${client.name} ${["Makes Headlines", "In the News", "Featured Story", "Breaking News"][i % 4]}`,
+  const sampleArticles: Article[] = Array.from({ length: articleCount }, (_, i) => ({
+    id: i + 1000 + parseInt(clientId) * 100,
+    title: `${client.name} ${["Makes Headlines", "In the News", "Featured Story", "Breaking News", "Global Coverage", "International Spotlight"][i % 6]}`,
     url: `https://example.com/article${i}`,
-    outlet: ["BBC", "CNN", "Reuters", "The Times", "Guardian"][i % 5],
+    outlet: outlets[i % outlets.length],
     tier: (["Top", "Mid", "Blog"] as const)[i % 3],
     focusType: (["Headline", "Mention"] as const)[i % 2],
     estViews: Math.floor(Math.random() * 100000) + 1000,
     publishedAt: new Date().toISOString(),
     sentiment: (["positive", "neutral", "negative"] as const)[i % 3],
-    summary: `Sample coverage about ${client.name}.`,
+    summary: `${includeInternational ? 'International' : 'UK'} coverage about ${client.name}.`,
     includedInReport: Math.random() > 0.3,
   }));
 

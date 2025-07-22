@@ -6,7 +6,6 @@ import { Sidebar } from "./sidebar";
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  selectedClient: string;
   selectedDate: string;
   onNewReport: () => void;
   onExportPDF: () => void;
@@ -15,7 +14,6 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({
   children,
-  selectedClient,
   selectedDate,
   onNewReport,
   onExportPDF,
@@ -24,7 +22,6 @@ export function DashboardLayout({
   return (
     <div className="min-h-screen bg-background">
       <Header
-        selectedClient={selectedClient}
         selectedDate={selectedDate}
         onNewReport={onNewReport}
         onExportPDF={onExportPDF}

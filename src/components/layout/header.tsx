@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Plus, FileText, Send } from "lucide-react";
+import Image from "next/image";
 
 interface HeaderProps {
   selectedClient: string;
@@ -12,20 +13,21 @@ interface HeaderProps {
 }
 
 export function Header({
-  selectedClient,
   selectedDate,
   onNewReport,
   onExportPDF,
   onSendReport,
-}: HeaderProps) {
+}: Omit<HeaderProps, 'selectedClient'>) {
   return (
-    <header className="border-b bg-white px-6 py-4">
+    <header className="border-b bg-white/80 backdrop-blur-md px-6 py-4 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <img 
+            <Image 
               src="/clippings-logo.svg" 
               alt="Clippings" 
+              width={32}
+              height={32}
               className="h-8 w-auto"
             />
           </div>

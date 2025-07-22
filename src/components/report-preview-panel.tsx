@@ -88,7 +88,7 @@ export function ReportPreviewPanel({
               <span className="font-medium">{article.outlet}</span>
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                {new Date(article.publishedAt).toLocaleDateString()}
+                {new Date(article.publishedAt).toLocaleDateString('en-US')}
               </div>
             </div>
             <div className="text-right">
@@ -111,21 +111,21 @@ export function ReportPreviewPanel({
   );
 
   return (
-    <Card className="h-fit">
+    <Card className="h-fit bg-white/90 backdrop-blur-sm shadow-lg border-white/20">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Report Preview
+            <FileText className="h-5 w-5 flex-shrink-0" />
+            <span>Report Preview</span>
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button onClick={onExportPDF} variant="outline" size="sm">
-              <FileText className="h-4 w-4 mr-2" />
-              Generate PDF
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Button onClick={onExportPDF} variant="outline" size="sm" className="whitespace-nowrap text-xs px-3">
+              <FileText className="h-3 w-3 mr-1" />
+              PDF
             </Button>
-            <Button onClick={onSendReport} size="sm">
-              <Send className="h-4 w-4 mr-2" />
-              Send via Email
+            <Button onClick={onSendReport} size="sm" className="whitespace-nowrap text-xs px-3">
+              <Send className="h-3 w-3 mr-1" />
+              Email
             </Button>
           </div>
         </div>
@@ -133,13 +133,13 @@ export function ReportPreviewPanel({
       
       <CardContent className="space-y-4">
         {/* Report Header */}
-        <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+        <div className="bg-gradient-to-r from-gray-50/80 to-white/50 backdrop-blur-sm rounded-lg p-4 space-y-2 border border-white/30">
           <h3 className="font-semibold text-lg">{report.clientName} - Media Coverage Report</h3>
           <div className="text-sm text-muted-foreground">
-            <div>Date: {new Date(report.date).toLocaleDateString()}</div>
+            <div>Date: {new Date(report.date).toLocaleDateString('en-US')}</div>
             <div>Total Coverage Items: {includedArticles.length}</div>
             {report.generatedAt && (
-              <div>Generated: {new Date(report.generatedAt).toLocaleString()}</div>
+              <div>Generated: {new Date(report.generatedAt).toLocaleString('en-US')}</div>
             )}
           </div>
         </div>
@@ -147,7 +147,7 @@ export function ReportPreviewPanel({
         {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-2">
           {Object.entries(articlesByTier).map(([tier, articles]) => (
-            <div key={tier} className="bg-gray-50 rounded p-3 text-center">
+            <div key={tier} className="bg-gradient-to-br from-white/70 to-gray-50/70 backdrop-blur-sm rounded p-3 text-center border border-white/40 shadow-sm">
               <div className="font-semibold text-lg">{articles.length}</div>
               <div className="text-xs text-muted-foreground">{tier}-Tier</div>
             </div>
@@ -184,17 +184,17 @@ export function ReportPreviewPanel({
         {/* Export Actions */}
         {includedArticles.length > 0 && (
           <div className="pt-4 border-t">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="text-sm text-muted-foreground">
                 Ready to generate report for <strong>{report.clientName}</strong>
               </div>
-              <div className="flex items-center gap-2">
-                <Button onClick={onExportPDF} variant="outline" size="sm">
-                  <FileText className="h-4 w-4 mr-2" />
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Button onClick={onExportPDF} variant="outline" size="sm" className="whitespace-nowrap text-xs px-3">
+                  <FileText className="h-3 w-3 mr-1" />
                   Export PDF
                 </Button>
-                <Button onClick={onSendReport} size="sm">
-                  <Send className="h-4 w-4 mr-2" />
+                <Button onClick={onSendReport} size="sm" className="whitespace-nowrap text-xs px-3">
+                  <Send className="h-3 w-3 mr-1" />
                   Send Report
                 </Button>
               </div>

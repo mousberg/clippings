@@ -38,7 +38,7 @@ export function Sidebar({ className }: SidebarProps) {
   ];
 
   return (
-    <aside className={`w-64 border-r bg-gray-50/40 ${className}`}>
+    <aside className={`w-64 border-r bg-white/80 backdrop-blur-sm ${className}`}>
       <div className="p-4 space-y-4">
         {/* Navigation Menu */}
         <nav className="space-y-2">
@@ -59,9 +59,9 @@ export function Sidebar({ className }: SidebarProps) {
         </nav>
 
         {/* Quick Stats Card */}
-        <Card>
+        <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Today's Metrics</CardTitle>
+            <CardTitle className="text-sm font-medium">Today&apos;s Metrics</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center gap-2">

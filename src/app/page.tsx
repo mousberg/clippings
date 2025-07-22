@@ -7,6 +7,7 @@ import { DatePicker } from "@/components/date-picker";
 import { MediaSummaryCards } from "@/components/media-summary-cards";
 import { CoverageFeedTable } from "@/components/coverage-feed-table";
 import { ReportPreviewPanel } from "@/components/report-preview-panel";
+import { NewReportModal } from "@/components/new-report-modal";
 import { 
   mockClients, 
   mockDailyReport, 
@@ -19,6 +20,7 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentReport, setCurrentReport] = useState<DailyReport>(mockDailyReport);
   const [filterTier, setFilterTier] = useState<ArticleTier | null>(null);
+  const [isNewReportModalOpen, setIsNewReportModalOpen] = useState(false);
 
   // Generate report when client or date changes
   useEffect(() => {
@@ -48,10 +50,18 @@ export default function Home() {
   };
 
   const handleNewReport = () => {
-    const report = generateMockReportForClient(selectedClientId);
+    setIsNewReportModalOpen(true);
+  };
+
+  const handleGenerateReport = (clientId: string, includeInternational: boolean) => {
+    const report = generateMockReportForClient(clientId, includeInternational);
     report.date = selectedDate.toISOString().split('T')[0];
+    
+    // Update the current selections to match the generated report
+    setSelectedClientId(clientId);
     setCurrentReport(report);
-    console.log("Generated new report for", report.clientName);
+    
+    console.log(`Generated new ${includeInternational ? 'international' : 'UK'} report for`, report.clientName);
   };
 
   const handleExportPDF = () => {
@@ -74,7 +84,6 @@ export default function Home() {
 
   return (
     <DashboardLayout
-      selectedClient={currentReport.clientName}
       selectedDate={formatDate(selectedDate)}
       onNewReport={handleNewReport}
       onExportPDF={handleExportPDF}
@@ -135,6 +144,14 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* New Report Modal */}
+      <NewReportModal
+        isOpen={isNewReportModalOpen}
+        onClose={() => setIsNewReportModalOpen(false)}
+        clients={mockClients}
+        onGenerateReport={handleGenerateReport}
+      />
     </DashboardLayout>
   );
 }

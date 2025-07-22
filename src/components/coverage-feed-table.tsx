@@ -43,7 +43,7 @@ export function CoverageFeedTable({
 
   // Filter and sort articles
   const filteredAndSortedArticles = useMemo(() => {
-    let filtered = filterTier 
+    const filtered = filterTier 
       ? articles.filter(article => article.tier === filterTier)
       : articles;
 
@@ -122,7 +122,7 @@ export function CoverageFeedTable({
   };
 
   return (
-    <Card>
+    <Card className="bg-white/90 backdrop-blur-sm shadow-lg border-white/20">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
@@ -234,7 +234,7 @@ export function CoverageFeedTable({
                   <TableCell>
                     <div className="font-medium">{article.outlet}</div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(article.publishedAt).toLocaleDateString()}
+                      {new Date(article.publishedAt).toLocaleDateString('en-US')}
                     </div>
                   </TableCell>
                   
