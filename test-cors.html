@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Backend CORS</title>
+</head>
+<body>
+    <h1>Test Backend CORS</h1>
+    <button onclick="testBackend()">Test PDF Generation</button>
+    <div id="result"></div>
+
+    <script>
+        async function testBackend() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('https://pr-coverage-gen-534113739138.europe-west1.run.app/generate-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subject: 'Harry Styles',
+                        max_articles: 5,
+                        filename: 'test.pdf',
+                        language: 'en-US',
+                        country: 'GB'
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    resultDiv.innerHTML = `✅ Success! PDF size: ${blob.size} bytes`;
+                } else {
+                    resultDiv.innerHTML = `❌ Server error: ${response.status} ${response.statusText}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ CORS Error: ${error.message}<br><br>The backend needs to add CORS headers to allow browser requests.`;
+                console.error('Full error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

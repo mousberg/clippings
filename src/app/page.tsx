@@ -125,7 +125,7 @@ export default function Home() {
         console.error('Backend error details:', error);
         // Show more detailed error for debugging
         if (error instanceof Error) {
-          alert(`PDF export failed: ${error.message}\n\nThis might be a CORS issue. The backend needs to allow requests from your domain.`);
+          alert(`PDF export failed: ${error.message}\n\nPlease check the browser console (F12) for detailed error information.\n\nThe backend needs CORS headers to allow requests from ${window.location.origin}`);
         } else {
           const filename = `${currentReport.clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`;
           alert(`PDF export ready for ${currentReport.clientName} - would download as: ${filename}`);

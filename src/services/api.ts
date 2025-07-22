@@ -53,27 +53,48 @@ export class ApiService {
   }
 
   static async generateReport(clientName: string, includeInternational: boolean = false): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/generate-report`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    try {
+      console.log(`Calling backend API at: ${API_BASE_URL}/generate-report`);
+      console.log('Request payload:', {
         subject: clientName,
         max_articles: includeInternational ? 20 : 15,
-        filename: `${clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`,
         language: 'en-US',
         country: includeInternational ? 'US' : 'GB',
-        // Note: Backend developer needs to set GOOGLE_API_KEY environment variable
-        // or we need to pass google_api_key parameter here
-      }),
-    });
+      });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const response = await fetch(`${API_BASE_URL}/generate-report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: clientName,
+          max_articles: includeInternational ? 20 : 15,
+          filename: `${clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`,
+          language: 'en-US',
+          country: includeInternational ? 'US' : 'GB',
+        }),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Backend error response:', errorText);
+        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const blob = await response.blob();
+      console.log('PDF blob size:', blob.size, 'bytes');
+      return blob;
+    } catch (error) {
+      console.error('Full error details:', error);
+      if (error instanceof TypeError && error.message === 'Load failed') {
+        throw new Error('Network error: Cannot connect to backend. This is likely a CORS issue.');
+      }
+      throw error;
     }
-
-    return response.blob();
   }
 
   static async exportPDF(request: ExportPDFRequest): Promise<{ downloadUrl: string; filename: string }> {
