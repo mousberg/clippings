@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { WelcomeScreen } from "@/components/welcome-screen";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { ClientSelector } from "@/components/client-selector";
 import { DatePicker } from "@/components/date-picker";
@@ -16,33 +17,39 @@ import {
 import { DailyReport, ArticleTier } from "@/types";
 
 export default function Home() {
-  const [selectedClientId, setSelectedClientId] = useState("1");
+  const [selectedClientId, setSelectedClientId] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [currentReport, setCurrentReport] = useState<DailyReport>(mockDailyReport);
+  const [currentReport, setCurrentReport] = useState<DailyReport | null>(null);
   const [filterTier, setFilterTier] = useState<ArticleTier | null>(null);
   const [isNewReportModalOpen, setIsNewReportModalOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
-  // Generate report when client or date changes
+  // Generate report when client or date changes (only if we have a selected client)
   useEffect(() => {
-    try {
-      const report = generateMockReportForClient(selectedClientId);
-      report.date = selectedDate.toISOString().split('T')[0];
-      setCurrentReport(report);
-    } catch (error) {
-      console.error("Error generating report:", error);
-      setCurrentReport(mockDailyReport);
+    if (selectedClientId && !showWelcome) {
+      try {
+        const report = generateMockReportForClient(selectedClientId);
+        report.date = selectedDate.toISOString().split('T')[0];
+        setCurrentReport(report);
+      } catch (error) {
+        console.error("Error generating report:", error);
+        setCurrentReport(null);
+      }
     }
-  }, [selectedClientId, selectedDate]);
+  }, [selectedClientId, selectedDate, showWelcome]);
 
   const handleToggleArticleInclude = (articleId: number, include: boolean) => {
-    setCurrentReport(prev => ({
-      ...prev,
-      articles: prev.articles.map(article => 
-        article.id === articleId 
-          ? { ...article, includedInReport: include }
-          : article
-      )
-    }));
+    setCurrentReport(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        articles: prev.articles.map(article => 
+          article.id === articleId 
+            ? { ...article, includedInReport: include }
+            : article
+        )
+      };
+    });
   };
 
   const handleTierFilter = (tier: ArticleTier) => {
@@ -51,6 +58,18 @@ export default function Home() {
 
   const handleNewReport = () => {
     setIsNewReportModalOpen(true);
+  };
+
+  const handleWelcomeClientSelect = (clientId: string, includeInternational: boolean) => {
+    const report = generateMockReportForClient(clientId, includeInternational);
+    report.date = selectedDate.toISOString().split('T')[0];
+    
+    // Update the current selections and hide welcome screen
+    setSelectedClientId(clientId);
+    setCurrentReport(report);
+    setShowWelcome(false);
+    
+    console.log(`Generated new ${includeInternational ? 'international' : 'UK'} report for`, report.clientName);
   };
 
   const handleGenerateReport = (clientId: string, includeInternational: boolean) => {
@@ -65,13 +84,22 @@ export default function Home() {
   };
 
   const handleExportPDF = () => {
+    if (!currentReport) return;
     console.log("Exporting PDF for", currentReport.clientName);
     alert(`Exporting PDF report for ${currentReport.clientName} - ${currentReport.date}`);
   };
 
   const handleSendReport = () => {
+    if (!currentReport) return;
     console.log("Sending report for", currentReport.clientName);
     alert(`Sending report for ${currentReport.clientName} via email`);
+  };
+
+  const handleLogoClick = () => {
+    setShowWelcome(true);
+    setCurrentReport(null);
+    setSelectedClientId("");
+    setFilterTier(null);
   };
 
   const formatDate = (date: Date) => {
@@ -82,12 +110,23 @@ export default function Home() {
     }).format(date);
   };
 
+  // Show welcome screen if no report is selected
+  if (showWelcome || !currentReport) {
+    return (
+      <WelcomeScreen
+        clients={mockClients}
+        onClientSelect={handleWelcomeClientSelect}
+      />
+    );
+  }
+
   return (
     <DashboardLayout
       selectedDate={formatDate(selectedDate)}
       onNewReport={handleNewReport}
       onExportPDF={handleExportPDF}
       onSendReport={handleSendReport}
+      onLogoClick={handleLogoClick}
     >
       <div className="space-y-6">
         {/* Client and Date Selection */}

@@ -10,6 +10,7 @@ interface DashboardLayoutProps {
   onNewReport: () => void;
   onExportPDF: () => void;
   onSendReport: () => void;
+  onLogoClick?: () => void;
 }
 
 export function DashboardLayout({
@@ -18,6 +19,7 @@ export function DashboardLayout({
   onNewReport,
   onExportPDF,
   onSendReport,
+  onLogoClick,
 }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
@@ -26,6 +28,7 @@ export function DashboardLayout({
         onNewReport={onNewReport}
         onExportPDF={onExportPDF}
         onSendReport={onSendReport}
+        onLogoClick={onLogoClick}
       />
       
       <div className="flex">

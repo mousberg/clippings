@@ -10,6 +10,7 @@ interface HeaderProps {
   onNewReport: () => void;
   onExportPDF: () => void;
   onSendReport: () => void;
+  onLogoClick?: () => void;
 }
 
 export function Header({
@@ -17,12 +18,17 @@ export function Header({
   onNewReport,
   onExportPDF,
   onSendReport,
+  onLogoClick,
 }: Omit<HeaderProps, 'selectedClient'>) {
   return (
     <header className="border-b bg-white/80 backdrop-blur-md px-6 py-4 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
+          <button 
+            onClick={onLogoClick}
+            className="flex items-center gap-3 hover:opacity-75 transition-opacity duration-200"
+            title="Return to home"
+          >
             <Image 
               src="/clippings-logo.svg" 
               alt="Clippings" 
@@ -30,7 +36,7 @@ export function Header({
               height={32}
               className="h-8 w-auto"
             />
-          </div>
+          </button>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">Report for:</span>
             <span className="text-sm font-medium">{selectedDate}</span>
