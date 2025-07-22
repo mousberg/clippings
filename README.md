@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+<img src="public/clippings-logo.svg" width="300" alt="Clippings Logo">
 
-First, run the development server:
+# Clippings
+**AI-Powered Media Coverage Reports**
+
+Real-time PR coverage analysis using Google News RSS feeds and Google Gemini AI
+
+[Live Demo](https://getclippings.co) • [Try PDF Export](#-quick-start)
+
+</div>
+
+---
+
+## 🚀 What It Does
+
+Clippings generates professional media coverage reports for any person, brand, or topic:
+
+- **Real-time Google News scraping** for comprehensive coverage
+- **AI categorization** with Google Gemini (Top/Mid/Blog tier outlets)  
+- **Sentiment analysis** across all coverage
+- **Professional PDF reports** with clickable links
+- **8-12 second generation** from search to download
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS
+- **Backend**: FastAPI, Google News RSS, Google Gemini AI, ReportLab
+- **Deployment**: Vercel (frontend) + Google Cloud Run (backend)
+- **UI Components**: Radix UI, Lucide Icons
+
+## 🏃‍♂️ Quick Start
 
 ```bash
+# Clone repository
+git clone https://github.com/mousberg/clippings.git
+cd clippings
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production  
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) and search for any celebrity, brand, or topic.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📡 API Integration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The frontend connects to a Google Cloud Run backend at:
+```
+https://pr-coverage-gen-534113739138.europe-west1.run.app
+```
 
-## Learn More
+**Example API call:**
+```javascript
+fetch('/generate-report', {
+  method: 'POST',
+  body: JSON.stringify({
+    subject: "Harry Styles",
+    max_articles: 15,
+    language: "en-US", 
+    country: "GB"
+  })
+})
+```
 
-To learn more about Next.js, take a look at the following resources:
+Returns a PDF with real Google News data, AI-categorized by media tier.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+<div align="center">
 
-## Deploy on Vercel
+**Built with ❤️ for PR professionals**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+*Powered by Google Gemini AI*
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+</div>
