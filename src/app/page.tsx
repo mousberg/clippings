@@ -25,19 +25,10 @@ export default function Home() {
   const generateReportForClient = useCallback(async (clientName: string, includeInternational: boolean) => {
     setIsLoadingReport(true);
     try {
-      // Try real API first, fallback to mock data
-      let report: DailyReport;
-      try {
-        report = await ApiService.generateReport({
-          clientName,
-          includeInternational,
-          date: selectedDate.toISOString().split('T')[0],
-        });
-      } catch {
-        console.log('API not available, using fallback data');
-        report = await generateMockReportFallback(clientName, includeInternational);
-        report.date = selectedDate.toISOString().split('T')[0];
-      }
+      // For demo purposes, always use fallback data since backend isn't ready
+      console.log('Using mock data for demo - backend not yet deployed');
+      const report = await generateMockReportFallback(clientName, includeInternational);
+      report.date = selectedDate.toISOString().split('T')[0];
       
       setCurrentReport(report);
     } catch (error) {

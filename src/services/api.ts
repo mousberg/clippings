@@ -101,11 +101,49 @@ export async function generateMockReportFallback(
   includeInternational: boolean = false
 ): Promise<DailyReport> {
   // This will be removed once real API is ready
-  const { generateMockReportForClient } = await import('@/data/mockData');
   
-  const report = generateMockReportForClient('1', includeInternational);
-  report.clientName = clientName;
-  report.clientId = clientName.toLowerCase().replace(/\s+/g, '-');
+  // Generate realistic mock data for any client
+  const outlets = includeInternational 
+    ? ["BBC", "The Guardian", "The Times", "Sky News", "CNN", "Reuters", "AP", "Bloomberg", "Wall Street Journal"] 
+    : ["BBC", "The Guardian", "The Times", "Sky News", "Independent"];
   
-  return report;
+  const articleCount = includeInternational ? Math.floor(Math.random() * 15) + 8 : Math.floor(Math.random() * 10) + 5;
+  
+  const sampleArticles = Array.from({ length: articleCount }, (_, i) => ({
+    id: i + 1000 + Math.floor(Math.random() * 1000),
+    title: `${clientName} ${["Makes Headlines", "In the News", "Featured Story", "Breaking News", "Global Coverage", "International Spotlight", "Media Buzz", "Industry Focus"][i % 8]}`,
+    url: `https://example.com/article${i}`,
+    outlet: outlets[i % outlets.length],
+    tier: (["Top", "Mid", "Blog"] as const)[Math.floor(Math.random() * 3)],
+    focusType: (["Headline", "Mention"] as const)[Math.floor(Math.random() * 2)],
+    estViews: Math.floor(Math.random() * 100000) + 1000,
+    publishedAt: new Date(Date.now() - Math.floor(Math.random() * 24 * 60 * 60 * 1000)).toISOString(),
+    sentiment: (["positive", "neutral", "negative"] as const)[Math.floor(Math.random() * 3)],
+    summary: `${includeInternational ? 'International' : 'UK'} coverage featuring ${clientName} in ${outlets[i % outlets.length]}.`,
+    includedInReport: Math.random() > 0.2, // Most articles included by default
+    screenshot: `/screenshots/article-${i}.png`
+  }));
+  
+  const topCount = sampleArticles.filter(a => a.tier === "Top").length;
+  const midCount = sampleArticles.filter(a => a.tier === "Mid").length;
+  const blogCount = sampleArticles.filter(a => a.tier === "Blog").length;
+  
+  return {
+    clientId: clientName.toLowerCase().replace(/\s+/g, '-'),
+    clientName: clientName,
+    date: new Date().toISOString().split('T')[0],
+    articles: sampleArticles,
+    summary: {
+      topTierCount: topCount,
+      midTierCount: midCount,
+      blogCount: blogCount,
+      totalMentions: sampleArticles.length,
+      sentimentBreakdown: {
+        positive: sampleArticles.filter(a => a.sentiment === "positive").length,
+        neutral: sampleArticles.filter(a => a.sentiment === "neutral").length,
+        negative: sampleArticles.filter(a => a.sentiment === "negative").length,
+      },
+    },
+    generatedAt: new Date().toISOString(),
+  };
 }
