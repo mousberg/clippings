@@ -1,11 +1,13 @@
 import { DailyReport } from "@/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface GenerateReportRequest {
-  clientName: string;
-  includeInternational: boolean;
-  date?: string;
+  subject: string;
+  max_articles?: number;
+  filename?: string;
+  language?: string;
+  country?: string;
 }
 
 export interface ExportPDFRequest {
@@ -50,15 +52,26 @@ export class ApiService {
     return response.json();
   }
 
-  static async generateReport(request: GenerateReportRequest): Promise<DailyReport> {
-    return this.request<{ report: DailyReport }>('/reports/generate', {
+  static async generateReport(clientName: string, includeInternational: boolean = false): Promise<Blob> {
+    const response = await fetch(`${API_BASE_URL}/generate-report`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        clientName: request.clientName,
-        includeInternational: request.includeInternational,
-        date: request.date || new Date().toISOString().split('T')[0],
+        subject: clientName,
+        max_articles: includeInternational ? 20 : 15,
+        filename: `${clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`,
+        language: 'en-US',
+        country: includeInternational ? 'US' : 'GB',
       }),
-    }).then(response => response.report);
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.blob();
   }
 
   static async exportPDF(request: ExportPDFRequest): Promise<{ downloadUrl: string; filename: string }> {
