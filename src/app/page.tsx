@@ -122,10 +122,14 @@ export default function Home() {
         console.log(`PDF downloaded: ${filename}`);
         
       } catch (error) {
-        console.error('Backend not available, showing demo alert:', error);
-        // Fallback for demo when backend isn't ready
-        const filename = `${currentReport.clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`;
-        alert(`PDF export ready for ${currentReport.clientName} - would download as: ${filename}`);
+        console.error('Backend error details:', error);
+        // Show more detailed error for debugging
+        if (error instanceof Error) {
+          alert(`PDF export failed: ${error.message}\n\nThis might be a CORS issue. The backend needs to allow requests from your domain.`);
+        } else {
+          const filename = `${currentReport.clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`;
+          alert(`PDF export ready for ${currentReport.clientName} - would download as: ${filename}`);
+        }
       }
       
     } finally {
