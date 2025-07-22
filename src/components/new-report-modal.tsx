@@ -25,7 +25,7 @@ interface NewReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   clients: Client[];
-  onGenerateReport: (clientId: string, includeInternational: boolean) => void;
+  onGenerateReport: (clientName: string, includeInternational: boolean) => void;
 }
 
 export function NewReportModal({ 
@@ -51,10 +51,15 @@ export function NewReportModal({
     
     setIsGenerating(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Find client name from ID
+    const selectedClient = clients.find(c => c.id === selectedClientId);
+    const clientName = selectedClient ? selectedClient.name : selectedClientId;
     
-    onGenerateReport(selectedClientId, includeInternational);
+    try {
+      await onGenerateReport(clientName, includeInternational);
+    } catch (error) {
+      console.error('Error generating report:', error);
+    }
     
     // Reset form
     setSelectedClientId("");

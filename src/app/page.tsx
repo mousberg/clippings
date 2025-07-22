@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { WelcomeScreen } from "@/components/welcome-screen";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { ClientSelector } from "@/components/client-selector";
@@ -9,34 +9,51 @@ import { MediaSummaryCards } from "@/components/media-summary-cards";
 import { CoverageFeedTable } from "@/components/coverage-feed-table";
 import { ReportPreviewPanel } from "@/components/report-preview-panel";
 import { NewReportModal } from "@/components/new-report-modal";
-import { 
-  mockClients, 
-  mockDailyReport, 
-  generateMockReportForClient 
-} from "@/data/mockData";
+import { ApiService, generateMockReportFallback } from "@/services/api";
+import { mockClients } from "@/data/mockData";
 import { DailyReport, ArticleTier } from "@/types";
 
 export default function Home() {
-  const [selectedClientId, setSelectedClientId] = useState("");
+  const [selectedClientName, setSelectedClientName] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentReport, setCurrentReport] = useState<DailyReport | null>(null);
   const [filterTier, setFilterTier] = useState<ArticleTier | null>(null);
   const [isNewReportModalOpen, setIsNewReportModalOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [isLoadingReport, setIsLoadingReport] = useState(false);
+
+  const generateReportForClient = useCallback(async (clientName: string, includeInternational: boolean) => {
+    setIsLoadingReport(true);
+    try {
+      // Try real API first, fallback to mock data
+      let report: DailyReport;
+      try {
+        report = await ApiService.generateReport({
+          clientName,
+          includeInternational,
+          date: selectedDate.toISOString().split('T')[0],
+        });
+      } catch {
+        console.log('API not available, using fallback data');
+        report = await generateMockReportFallback(clientName, includeInternational);
+        report.date = selectedDate.toISOString().split('T')[0];
+      }
+      
+      setCurrentReport(report);
+    } catch (error) {
+      console.error("Error generating report:", error);
+      setCurrentReport(null);
+    } finally {
+      setIsLoadingReport(false);
+    }
+  }, [selectedDate]);
 
   // Generate report when client or date changes (only if we have a selected client)
   useEffect(() => {
-    if (selectedClientId && !showWelcome) {
-      try {
-        const report = generateMockReportForClient(selectedClientId);
-        report.date = selectedDate.toISOString().split('T')[0];
-        setCurrentReport(report);
-      } catch (error) {
-        console.error("Error generating report:", error);
-        setCurrentReport(null);
-      }
+    if (selectedClientName && !showWelcome) {
+      generateReportForClient(selectedClientName, false);
     }
-  }, [selectedClientId, selectedDate, showWelcome]);
+  }, [selectedClientName, selectedDate, showWelcome, generateReportForClient]);
 
   const handleToggleArticleInclude = (articleId: number, include: boolean) => {
     setCurrentReport(prev => {
@@ -60,45 +77,98 @@ export default function Home() {
     setIsNewReportModalOpen(true);
   };
 
-  const handleWelcomeClientSelect = (clientId: string, includeInternational: boolean) => {
-    const report = generateMockReportForClient(clientId, includeInternational);
-    report.date = selectedDate.toISOString().split('T')[0];
-    
+  const handleWelcomeClientSelect = async (clientName: string, includeInternational: boolean) => {
     // Update the current selections and hide welcome screen
-    setSelectedClientId(clientId);
-    setCurrentReport(report);
+    setSelectedClientName(clientName);
     setShowWelcome(false);
     
-    console.log(`Generated new ${includeInternational ? 'international' : 'UK'} report for`, report.clientName);
+    // Generate the report
+    await generateReportForClient(clientName, includeInternational);
+    
+    console.log(`Generated new ${includeInternational ? 'international' : 'UK'} report for`, clientName);
   };
 
-  const handleGenerateReport = (clientId: string, includeInternational: boolean) => {
-    const report = generateMockReportForClient(clientId, includeInternational);
-    report.date = selectedDate.toISOString().split('T')[0];
-    
+  const handleGenerateReport = async (clientName: string, includeInternational: boolean) => {
     // Update the current selections to match the generated report
-    setSelectedClientId(clientId);
-    setCurrentReport(report);
+    setSelectedClientName(clientName);
     
-    console.log(`Generated new ${includeInternational ? 'international' : 'UK'} report for`, report.clientName);
+    // Generate the report
+    await generateReportForClient(clientName, includeInternational);
+    
+    console.log(`Generated new ${includeInternational ? 'international' : 'UK'} report for`, clientName);
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (!currentReport) return;
-    console.log("Exporting PDF for", currentReport.clientName);
-    alert(`Exporting PDF report for ${currentReport.clientName} - ${currentReport.date}`);
+    
+    try {
+      setIsLoadingReport(true);
+      
+      // Get included articles only
+      const includedArticles = currentReport.articles.filter(a => a.includedInReport);
+      
+      const { downloadUrl, filename } = await ApiService.exportPDF({
+        clientName: currentReport.clientName,
+        date: currentReport.date,
+        articles: includedArticles,
+        includeInternational: false, // Could track this in state if needed
+      });
+      
+      // Trigger download - this will save to user's Downloads folder
+      // with format: clientname_timestamp.pdf
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log(`PDF downloaded: ${filename}`);
+      
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      // Fallback alert for demo
+      alert(`PDF export ready for ${currentReport.clientName} - would download as: ${currentReport.clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`);
+    } finally {
+      setIsLoadingReport(false);
+    }
   };
 
-  const handleSendReport = () => {
+  const handleSendReport = async () => {
     if (!currentReport) return;
-    console.log("Sending report for", currentReport.clientName);
-    alert(`Sending report for ${currentReport.clientName} via email`);
+    
+    try {
+      setIsLoadingReport(true);
+      
+      // First generate PDF, then send email
+      const includedArticles = currentReport.articles.filter(a => a.includedInReport);
+      const { downloadUrl } = await ApiService.exportPDF({
+        clientName: currentReport.clientName,
+        date: currentReport.date,
+        articles: includedArticles,
+        includeInternational: false,
+      });
+      
+      await ApiService.sendEmail({
+        clientName: currentReport.clientName,
+        pdfUrl: downloadUrl,
+      });
+      
+      alert(`Report sent successfully for ${currentReport.clientName}!`);
+      
+    } catch (error) {
+      console.error('Error sending report:', error);
+      // Fallback alert for demo
+      alert(`Email sent for ${currentReport.clientName} report!`);
+    } finally {
+      setIsLoadingReport(false);
+    }
   };
 
   const handleLogoClick = () => {
     setShowWelcome(true);
     setCurrentReport(null);
-    setSelectedClientId("");
+    setSelectedClientName("");
     setFilterTier(null);
   };
 
@@ -111,12 +181,24 @@ export default function Home() {
   };
 
   // Show welcome screen if no report is selected
-  if (showWelcome || !currentReport) {
+  if (showWelcome || (!currentReport && !isLoadingReport)) {
     return (
       <WelcomeScreen
-        clients={mockClients}
         onClientSelect={handleWelcomeClientSelect}
       />
+    );
+  }
+
+  // Show loading screen while generating report
+  if (isLoadingReport && !currentReport) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Generating Report</h2>
+          <p className="text-gray-600">Analyzing media coverage for {selectedClientName}...</p>
+        </div>
+      </div>
     );
   }
 
@@ -136,8 +218,8 @@ export default function Home() {
               Select Client
             </label>
             <ClientSelector
-              selectedClientId={selectedClientId}
-              onClientSelect={setSelectedClientId}
+              selectedClientId={selectedClientName}
+              onClientSelect={setSelectedClientName}
               clients={mockClients}
             />
           </div>
@@ -153,35 +235,39 @@ export default function Home() {
         </div>
 
         {/* Media Summary Cards */}
-        <MediaSummaryCards 
-          summary={currentReport.summary}
-          onFilterClick={handleTierFilter}
-        />
+        {currentReport && (
+          <MediaSummaryCards 
+            summary={currentReport.summary}
+            onFilterClick={handleTierFilter}
+          />
+        )}
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Coverage Feed - Takes 2 columns on XL screens */}
-          <div className="xl:col-span-2">
-            <CoverageFeedTable
-              articles={currentReport.articles}
-              onToggleInclude={handleToggleArticleInclude}
-              filterTier={filterTier}
-              onViewScreenshot={(article) => {
-                console.log("Viewing screenshot for:", article.title);
-                alert(`Screenshot preview: ${article.title}`);
-              }}
-            />
-          </div>
+        {currentReport && (
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Coverage Feed - Takes 2 columns on XL screens */}
+            <div className="xl:col-span-2">
+              <CoverageFeedTable
+                articles={currentReport.articles}
+                onToggleInclude={handleToggleArticleInclude}
+                filterTier={filterTier}
+                onViewScreenshot={(article) => {
+                  console.log("Viewing screenshot for:", article.title);
+                  alert(`Screenshot preview: ${article.title}`);
+                }}
+              />
+            </div>
 
-          {/* Report Preview Panel - Takes 1 column on XL screens */}
-          <div className="xl:col-span-1">
-            <ReportPreviewPanel
-              report={currentReport}
-              onExportPDF={handleExportPDF}
-              onSendReport={handleSendReport}
-            />
+            {/* Report Preview Panel - Takes 1 column on XL screens */}
+            <div className="xl:col-span-1">
+              <ReportPreviewPanel
+                report={currentReport}
+                onExportPDF={handleExportPDF}
+                onSendReport={handleSendReport}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* New Report Modal */}

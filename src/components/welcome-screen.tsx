@@ -1,40 +1,88 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useRef } from "react";
 import { Switch } from "@/components/ui/switch";
 import { 
   Search,
   Globe,
   MapPin,
-  Sparkles
+  Sparkles,
+  Plus
 } from "lucide-react";
 import Image from "next/image";
-import { Client } from "@/types";
+import { ApiService } from "@/services/api";
 
 interface WelcomeScreenProps {
-  clients: Client[];
-  onClientSelect: (clientId: string, includeInternational: boolean) => void;
+  onClientSelect: (clientName: string, includeInternational: boolean) => void;
 }
 
-export function WelcomeScreen({ clients, onClientSelect }: WelcomeScreenProps) {
+export function WelcomeScreen({ onClientSelect }: WelcomeScreenProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [includeInternational, setIncludeInternational] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const filteredClients = clients.filter(client => 
-    client.isActive && 
-    client.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Popular clients for quick access
+  const popularClients = ['Beyoncé', 'Harry Styles', 'Taylor Swift', 'Netflix'];
 
-  const handleClientSelect = async (clientId: string) => {
+  // Fetch suggestions when user types
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.length >= 2) {
+      setIsLoadingSuggestions(true);
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          const clientSuggestions = await ApiService.searchClients(searchQuery);
+          setSuggestions(clientSuggestions);
+          setShowSuggestions(true);
+        } catch (error) {
+          console.error('Error fetching suggestions:', error);
+          setSuggestions([]);
+        } finally {
+          setIsLoadingSuggestions(false);
+        }
+      }, 300);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      setIsLoadingSuggestions(false);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
+
+  const handleClientSelect = async (clientName: string) => {
     setIsGenerating(true);
+    setShowSuggestions(false);
     
-    // Simulate loading
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    onClientSelect(clientId, includeInternational);
-    setIsGenerating(false);
+    try {
+      await onClientSelect(clientName, includeInternational);
+    } catch (error) {
+      console.error('Error generating report:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      handleClientSelect(searchQuery.trim());
+    }
   };
 
   return (
@@ -69,19 +117,33 @@ export function WelcomeScreen({ clients, onClientSelect }: WelcomeScreenProps) {
           }`}>
             
             {/* Search Input */}
-            <div className="p-6 pb-4">
+            <form onSubmit={handleSearchSubmit} className="p-6 pb-4">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Globe className="h-5 w-5 text-gray-400" />
+                  {isLoadingSuggestions ? (
+                    <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                  ) : (
+                    <Search className="h-5 w-5 text-gray-400" />
+                  )}
                 </div>
                 <input
                   type="text"
-                  placeholder="Client name or search"
+                  placeholder="Enter any client name..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 border-0 bg-transparent focus:ring-0 focus:outline-none text-lg"
+                  onChange={handleSearchChange}
+                  className="block w-full pl-12 pr-12 py-4 text-gray-900 placeholder-gray-500 border-0 bg-transparent focus:ring-0 focus:outline-none text-lg"
                   style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
+                  disabled={isGenerating}
                 />
+                {searchQuery && (
+                  <button
+                    type="submit"
+                    disabled={isGenerating}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-blue-600 hover:text-blue-700 disabled:opacity-50"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                )}
               </div>
               
               {/* International Toggle */}
@@ -109,38 +171,52 @@ export function WelcomeScreen({ clients, onClientSelect }: WelcomeScreenProps) {
                   onCheckedChange={setIncludeInternational}
                 />
               </div>
-            </div>
+            </form>
 
-            {/* Client Results */}
-            {searchQuery && (
+            {/* Search Suggestions */}
+            {showSuggestions && suggestions.length > 0 && (
               <div className="border-t border-gray-100">
                 <div className="max-h-64 overflow-y-auto">
-                  {filteredClients.length > 0 ? (
-                    filteredClients.slice(0, 5).map((client) => (
-                      <button
-                        key={client.id}
-                        onClick={() => handleClientSelect(client.id)}
-                        disabled={isGenerating}
-                        className="w-full px-6 py-4 text-left hover:bg-gray-50 border-b border-gray-50 last:border-b-0 flex items-center justify-between group transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        <div>
-                          <div className="font-medium text-gray-900">{client.name}</div>
-                          <div className="text-sm text-gray-500">{client.industry}</div>
-                        </div>
-                        {isGenerating ? (
-                          <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-                        ) : (
-                          <Sparkles className="h-4 w-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
-                        )}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-6 py-8 text-center text-gray-500">
-                      <div className="text-sm">No clients found</div>
-                      <div className="text-xs">Try adjusting your search</div>
-                    </div>
-                  )}
+                  {suggestions.slice(0, 8).map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleClientSelect(suggestion)}
+                      disabled={isGenerating}
+                      className="w-full px-6 py-4 text-left hover:bg-gray-50 border-b border-gray-50 last:border-b-0 flex items-center justify-between group transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <div>
+                        <div className="font-medium text-gray-900">{suggestion}</div>
+                        <div className="text-sm text-gray-500">Generate report</div>
+                      </div>
+                      {isGenerating ? (
+                        <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                      )}
+                    </button>
+                  ))}
                 </div>
+              </div>
+            )}
+
+            {/* Current Search Display */}
+            {searchQuery && !showSuggestions && !isLoadingSuggestions && (
+              <div className="border-t border-gray-100 px-6 py-4">
+                <button
+                  onClick={() => handleClientSelect(searchQuery)}
+                  disabled={isGenerating}
+                  className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 transition-colors disabled:opacity-60"
+                >
+                  <div className="text-left">
+                    <div className="font-medium text-blue-900">Generate report for &quot;{searchQuery}&quot;</div>
+                    <div className="text-sm text-blue-700">Press Enter or click to continue</div>
+                  </div>
+                  {isGenerating ? (
+                    <div className="w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" />
+                  ) : (
+                    <Sparkles className="h-5 w-5 text-blue-600" />
+                  )}
+                </button>
               </div>
             )}
 
@@ -161,14 +237,14 @@ export function WelcomeScreen({ clients, onClientSelect }: WelcomeScreenProps) {
           <div className="mt-8">
             <p className="text-center text-gray-500 text-sm mb-4">Popular clients</p>
             <div className="flex flex-wrap gap-2 justify-center">
-              {clients.slice(0, 4).map((client) => (
+              {popularClients.map((clientName) => (
                 <button
-                  key={client.id}
-                  onClick={() => handleClientSelect(client.id)}
+                  key={clientName}
+                  onClick={() => handleClientSelect(clientName)}
                   disabled={isGenerating}
                   className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {client.name}
+                  {clientName}
                 </button>
               ))}
             </div>
