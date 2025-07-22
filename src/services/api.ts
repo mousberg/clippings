@@ -238,13 +238,27 @@ export async function generateMockReportFallback(
         summary: "Disgraced CEO considers legal action against band for broadcasting compromising footage.",
         includedInReport: true,
         screenshot: "/screenshots/pagesix-scandal.png"
+      },
+      {
+        id: 1008,
+        title: "Andy Byron's Wife Has Returned To FB? Her Alleged Statement On Husband's Cheating Surfaces",
+        url: "https://bollywoodshaadis.com/andy-byron-wife-statement",
+        outlet: "BollywoodShaadis",
+        tier: "Blog" as const,
+        focusType: "Headline" as const,
+        estViews: 32000,
+        publishedAt: new Date(Date.now() - 14 * 60 * 60 * 1000).toISOString(),
+        sentiment: "negative" as const,
+        summary: "Social media buzz around wife's alleged response to CEO's public affair scandal.",
+        includedInReport: true,
+        screenshot: "/screenshots/blog-scandal.png"
       }
     ];
 
     if (includeInternational) {
       scandalArticles.push(
         {
-          id: 1008,
+          id: 1009,
           title: "Mysterious Woman In Astronomer CEO's Coldplay Video Identified",
           url: "https://ndtv.com/andy-byron-woman-identified",
           outlet: "NDTV",
@@ -260,15 +274,19 @@ export async function generateMockReportFallback(
       );
     }
 
+    const topCount = scandalArticles.filter(a => a.tier === "Top").length;
+    const midCount = scandalArticles.filter(a => a.tier === "Mid").length;
+    const blogCount = scandalArticles.filter(a => a.tier === "Blog").length;
+
     return {
       clientId: 'andy-byron',
       clientName: 'Andy Byron',
       date: new Date().toISOString().split('T')[0],
       articles: scandalArticles,
       summary: {
-        topTierCount: scandalArticles.filter(a => a.tier === "Top").length,
-        midTierCount: scandalArticles.filter(a => a.tier === "Mid").length,
-        blogCount: scandalArticles.filter(a => a.tier === "Blog").length,
+        topTierCount: topCount,
+        midTierCount: midCount,
+        blogCount: blogCount,
         totalMentions: scandalArticles.length,
         sentimentBreakdown: {
           positive: 0,
