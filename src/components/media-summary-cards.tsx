@@ -61,83 +61,55 @@ export function MediaSummaryCards({ summary, onFilterClick }: MediaSummaryCardsP
   };
 
   return (
-    <div className="space-y-6">
-      {/* Summary Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {cards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Card 
-              key={card.tier}
-              className="cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => onFilterClick?.(card.tier)}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {card.title}
-                </CardTitle>
-                <div className={`p-2 rounded-lg ${card.bgColor}`}>
-                  <Icon className={`h-4 w-4 ${card.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{card.count}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {card.description}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Tier Cards */}
+      {cards.map((card) => {
+        const Icon = card.icon;
+        return (
+          <button
+            key={card.tier}
+            onClick={() => onFilterClick?.(card.tier)}
+            className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-zinc-200/50 shadow-sm hover:shadow-md transition-all duration-200 text-left group"
+          >
+            <div className="flex items-center">
+              <div className={`p-3 rounded-xl ${card.bgColor} group-hover:scale-105 transition-transform duration-200`}>
+                <Icon className={`h-6 w-6 ${card.color}`} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-zinc-600">{card.tier}-Tier</p>
+                <p className="text-2xl font-bold text-zinc-900">{card.count}</p>
+                <p className="text-xs text-zinc-500">{card.description}</p>
+              </div>
+            </div>
+          </button>
+        );
+      })}
 
       {/* Sentiment Overview Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <TrendingUp className="h-5 w-5" />
-            Sentiment Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3 gap-4">
-            {Object.entries(summary.sentimentBreakdown).map(([sentiment, count]) => (
-              <div key={sentiment} className="flex items-center gap-2">
+      <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-zinc-200/50 shadow-sm">
+        <div className="flex items-center mb-4">
+          <div className="p-3 bg-zinc-100 rounded-xl">
+            <TrendingUp className="h-6 w-6 text-zinc-600" />
+          </div>
+          <div className="ml-4">
+            <p className="text-sm font-medium text-zinc-600">Sentiment</p>
+            <p className="text-2xl font-bold text-zinc-900">{summary.totalMentions}</p>
+            <p className="text-xs text-zinc-500">Total coverage</p>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          {Object.entries(summary.sentimentBreakdown).map(([sentiment, count]) => (
+            <div key={sentiment} className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
                 {getSentimentIcon(sentiment as keyof typeof summary.sentimentBreakdown)}
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium capitalize">{sentiment}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {count}
-                    </Badge>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                    <div
-                      className={`h-1.5 rounded-full ${
-                        sentiment === "positive" 
-                          ? "bg-green-500" 
-                          : sentiment === "negative" 
-                          ? "bg-red-500" 
-                          : "bg-gray-500"
-                      }`}
-                      style={{ 
-                        width: `${(count / summary.totalMentions) * 100}%` 
-                      }}
-                    />
-                  </div>
-                </div>
+                <span className="text-sm font-medium text-zinc-700 capitalize">{sentiment}</span>
               </div>
-            ))}
-          </div>
-          
-          <div className="mt-4 pt-4 border-t">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{summary.totalMentions}</div>
-              <div className="text-sm text-muted-foreground">Total Mentions Today</div>
+              <span className="text-sm font-semibold text-zinc-900">{count}</span>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

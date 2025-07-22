@@ -122,152 +122,147 @@ export function CoverageFeedTable({
   };
 
   return (
-    <Card className="bg-white/90 backdrop-blur-sm shadow-lg border-white/20">
-      <CardHeader>
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-zinc-200/50 shadow-sm">
+      <div className="p-6 border-b border-zinc-200/50">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Coverage Feed
-            {filterTier && (
-              <Badge variant="secondary" className="ml-2">
-                Filtered by {filterTier}-Tier
-              </Badge>
-            )}
-          </CardTitle>
-          <div className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-zinc-100 rounded-lg">
+              <Filter className="h-5 w-5 text-zinc-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-zinc-900">Coverage Feed</h3>
+              {filterTier && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 mt-1">
+                  Filtered by {filterTier}-Tier
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="text-sm font-medium text-zinc-600">
             {filteredAndSortedArticles.length} articles
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px]">Tier</TableHead>
-                <TableHead className="w-[60px]">Image</TableHead>
-                <TableHead className="min-w-[300px]">Headline</TableHead>
-                <TableHead>Focus</TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto p-0 font-semibold"
-                    onClick={() => handleSort("outlet")}
-                  >
-                    Source
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto p-0 font-semibold"
-                    onClick={() => handleSort("views")}
-                  >
-                    Est. Views
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </TableHead>
-                <TableHead className="text-center">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAndSortedArticles.map((article) => (
-                <TableRow key={article.id}>
-                  <TableCell>
-                    <Badge 
-                      variant="secondary" 
-                      className={`flex items-center gap-1 ${getTierColor(article.tier)}`}
+      </div>
+      
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="border-b border-zinc-200/50">
+            <tr>
+              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600">Tier</th>
+              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600 w-16">Preview</th>
+              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600 min-w-[300px]">Headline</th>
+              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600">Focus</th>
+              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600">
+                <button
+                  className="flex items-center gap-1 hover:text-zinc-900 transition-colors"
+                  onClick={() => handleSort("outlet")}
+                >
+                  Source
+                  <ArrowUpDown className="h-4 w-4" />
+                </button>
+              </th>
+              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600">
+                <button
+                  className="flex items-center gap-1 hover:text-zinc-900 transition-colors"
+                  onClick={() => handleSort("views")}
+                >
+                  Est. Views
+                  <ArrowUpDown className="h-4 w-4" />
+                </button>
+              </th>
+              <th className="text-center py-3 px-6 text-sm font-medium text-zinc-600">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zinc-200/50">
+            {filteredAndSortedArticles.map((article) => (
+              <tr key={article.id} className="hover:bg-zinc-50/50 transition-colors group">
+                <td className="py-4 px-6">
+                  <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${getTierColor(article.tier)}`}>
+                    {getTierIcon(article.tier)}
+                    {article.tier}
+                  </span>
+                </td>
+                
+                <td className="py-4 px-6">
+                  {article.screenshot ? (
+                    <button
+                      className="group-hover:scale-105 transition-transform duration-200"
+                      onClick={() => onViewScreenshot?.(article)}
                     >
-                      {getTierIcon(article.tier)}
-                      {article.tier}
-                    </Badge>
-                  </TableCell>
-                  
-                  <TableCell>
-                    {article.screenshot ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="p-0 h-auto"
-                        onClick={() => onViewScreenshot?.(article)}
-                      >
-                        <div className="w-10 h-10 bg-gray-100 rounded border-2 border-gray-200 flex items-center justify-center">
-                          <ImageIcon className="h-4 w-4 text-gray-400" />
-                        </div>
-                      </Button>
+                      <div className="w-10 h-10 bg-zinc-100 rounded-lg border border-zinc-200 flex items-center justify-center hover:bg-zinc-200 transition-colors">
+                        <ImageIcon className="h-4 w-4 text-zinc-500" />
+                      </div>
+                    </button>
+                  ) : (
+                    <div className="w-10 h-10 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-center">
+                      <ImageIcon className="h-3 w-3 text-zinc-400" />
+                    </div>
+                  )}
+                </td>
+                
+                <td className="py-4 px-6">
+                  <div className="space-y-2">
+                    <div className="font-medium text-zinc-900 truncate pr-2 group-hover:text-zinc-700 transition-colors" title={article.title}>
+                      {article.title}
+                    </div>
+                    <div className="text-sm text-zinc-600 line-clamp-2 leading-relaxed">
+                      {article.summary}
+                    </div>
+                    <button
+                      className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-700 transition-colors"
+                      onClick={() => window.open(article.url, '_blank')}
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      View Article
+                    </button>
+                  </div>
+                </td>
+                
+                <td className="py-4 px-6">
+                  <div className={`text-sm font-medium ${getFocusTypeColor(article.focusType)} flex items-center gap-1`}>
+                    <div className={`w-2 h-2 rounded-full ${article.focusType === "Headline" ? "bg-green-500" : "bg-zinc-400"}`}></div>
+                    {article.focusType}
+                  </div>
+                </td>
+                
+                <td className="py-4 px-6">
+                  <div className="font-medium text-zinc-900">{article.outlet}</div>
+                  <div className="text-sm text-zinc-500">
+                    {new Date(article.publishedAt).toLocaleDateString('en-US')}
+                  </div>
+                </td>
+                
+                <td className="py-4 px-6">
+                  <div className="font-semibold text-zinc-900">{formatViews(article.estViews)}</div>
+                </td>
+                
+                <td className="py-4 px-6 text-center">
+                  <button
+                    onClick={() => onToggleInclude(article.id, !article.includedInReport)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                      article.includedInReport 
+                        ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100" 
+                        : "bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100"
+                    }`}
+                  >
+                    {article.includedInReport ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Included
+                      </>
                     ) : (
-                      <div className="w-10 h-10 bg-gray-50 rounded border border-gray-200 flex items-center justify-center">
-                        <ImageIcon className="h-3 w-3 text-gray-300" />
-                      </div>
+                      <>
+                        <X className="h-3 w-3" />
+                        Add to Report
+                      </>
                     )}
-                  </TableCell>
-                  
-                  <TableCell className="max-w-0">
-                    <div className="space-y-1">
-                      <div className="font-medium truncate pr-2" title={article.title}>
-                        {article.title}
-                      </div>
-                      <div className="text-xs text-muted-foreground line-clamp-2">
-                        {article.summary}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 text-xs text-blue-600 hover:text-blue-800"
-                        onClick={() => window.open(article.url, '_blank')}
-                      >
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        View Article
-                      </Button>
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className={`text-sm font-medium ${getFocusTypeColor(article.focusType)}`}>
-                      {article.focusType === "Headline" ? "🟢" : "🔘"} {article.focusType}
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="font-medium">{article.outlet}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(article.publishedAt).toLocaleDateString('en-US')}
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="font-medium">{formatViews(article.estViews)}</div>
-                  </TableCell>
-                  
-                  <TableCell className="text-center">
-                    <Button
-                      variant={article.includedInReport ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => onToggleInclude(article.id, !article.includedInReport)}
-                      className="flex items-center gap-1"
-                    >
-                      {article.includedInReport ? (
-                        <>
-                          <Check className="h-3 w-3" />
-                          Included
-                        </>
-                      ) : (
-                        <>
-                          <X className="h-3 w-3" />
-                          Add to Report
-                        </>
-                      )}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

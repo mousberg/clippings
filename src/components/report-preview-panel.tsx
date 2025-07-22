@@ -111,31 +111,42 @@ export function ReportPreviewPanel({
   );
 
   return (
-    <Card className="h-fit bg-white/90 backdrop-blur-sm shadow-lg border-white/20">
-      <CardHeader>
+    <div className="h-fit bg-white/70 backdrop-blur-sm rounded-2xl border border-zinc-200/50 shadow-sm">
+      <div className="p-6 border-b border-zinc-200/50">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 flex-shrink-0" />
-            <span>Report Preview</span>
-          </CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-zinc-100 rounded-lg">
+              <FileText className="h-5 w-5 text-zinc-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-zinc-900">Report Preview</h3>
+              <p className="text-sm text-zinc-600">Ready for export</p>
+            </div>
+          </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Button onClick={onExportPDF} variant="outline" size="sm" className="whitespace-nowrap text-xs px-3">
-              <FileText className="h-3 w-3 mr-1" />
+            <button 
+              onClick={onExportPDF} 
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100 transition-colors"
+            >
+              <FileText className="h-3 w-3" />
               PDF
-            </Button>
-            <Button onClick={onSendReport} size="sm" className="whitespace-nowrap text-xs px-3">
-              <Send className="h-3 w-3 mr-1" />
+            </button>
+            <button 
+              onClick={onSendReport} 
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 text-white hover:bg-zinc-800 transition-colors"
+            >
+              <Send className="h-3 w-3" />
               Email
-            </Button>
+            </button>
           </div>
         </div>
-      </CardHeader>
+      </div>
       
-      <CardContent className="space-y-4">
+      <div className="p-6 space-y-6">
         {/* Report Header */}
-        <div className="bg-gradient-to-r from-gray-50/80 to-white/50 backdrop-blur-sm rounded-lg p-4 space-y-2 border border-white/30">
-          <h3 className="font-semibold text-lg">{report.clientName} - Media Coverage Report</h3>
-          <div className="text-sm text-muted-foreground">
+        <div className="bg-zinc-50/50 rounded-xl p-4 space-y-2 border border-zinc-200/30">
+          <h3 className="font-semibold text-lg text-zinc-900">{report.clientName} - Media Coverage Report</h3>
+          <div className="text-sm text-zinc-600 space-y-1">
             <div>Date: {new Date(report.date).toLocaleDateString('en-US')}</div>
             <div>Total Coverage Items: {includedArticles.length}</div>
             {report.generatedAt && (
@@ -145,11 +156,11 @@ export function ReportPreviewPanel({
         </div>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-3">
           {Object.entries(articlesByTier).map(([tier, articles]) => (
-            <div key={tier} className="bg-gradient-to-br from-white/70 to-gray-50/70 backdrop-blur-sm rounded p-3 text-center border border-white/40 shadow-sm">
-              <div className="font-semibold text-lg">{articles.length}</div>
-              <div className="text-xs text-muted-foreground">{tier}-Tier</div>
+            <div key={tier} className="bg-zinc-50/70 rounded-xl p-3 text-center border border-zinc-200/40">
+              <div className="font-semibold text-lg text-zinc-900">{articles.length}</div>
+              <div className="text-xs text-zinc-600">{tier}-Tier</div>
             </div>
           ))}
         </div>
@@ -183,25 +194,31 @@ export function ReportPreviewPanel({
 
         {/* Export Actions */}
         {includedArticles.length > 0 && (
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t border-zinc-200/50">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="text-sm text-muted-foreground">
-                Ready to generate report for <strong>{report.clientName}</strong>
+              <div className="text-sm text-zinc-600">
+                Ready to generate report for <strong className="text-zinc-900">{report.clientName}</strong>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <Button onClick={onExportPDF} variant="outline" size="sm" className="whitespace-nowrap text-xs px-3">
-                  <FileText className="h-3 w-3 mr-1" />
+                <button 
+                  onClick={onExportPDF} 
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100 transition-colors"
+                >
+                  <FileText className="h-3 w-3" />
                   Export PDF
-                </Button>
-                <Button onClick={onSendReport} size="sm" className="whitespace-nowrap text-xs px-3">
-                  <Send className="h-3 w-3 mr-1" />
+                </button>
+                <button 
+                  onClick={onSendReport} 
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 text-white hover:bg-zinc-800 transition-colors"
+                >
+                  <Send className="h-3 w-3" />
                   Send Report
-                </Button>
+                </button>
               </div>
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

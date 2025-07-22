@@ -234,27 +234,29 @@ export default function Home() {
       isExportingPDF={isExportingPDF}
       exportProgress={exportProgress}
     >
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Client and Date Selection */}
-        <div className="flex items-center gap-4 pb-4 border-b">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              Select Client
-            </label>
-            <ClientSelector
-              selectedClientId={selectedClientName}
-              onClientSelect={setSelectedClientName}
-              clients={mockClients}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              Report Date
-            </label>
-            <DatePicker
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-            />
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-zinc-200/50 shadow-sm">
+          <div className="flex items-center gap-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-600">
+                Select Client
+              </label>
+              <ClientSelector
+                selectedClientId={selectedClientName}
+                onClientSelect={setSelectedClientName}
+                clients={mockClients}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-600">
+                Report Date
+              </label>
+              <DatePicker
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+              />
+            </div>
           </div>
         </div>
 
@@ -268,7 +270,7 @@ export default function Home() {
 
         {/* Main Content Grid */}
         {currentReport && (
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             {/* Coverage Feed - Takes 2 columns on XL screens */}
             <div className="xl:col-span-2">
               <CoverageFeedTable
