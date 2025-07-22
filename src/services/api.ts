@@ -1,6 +1,6 @@
 import { DailyReport } from "@/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pr-coverage-gen-534113739138.europe-west1.run.app';
 
 export interface GenerateReportRequest {
   subject: string;

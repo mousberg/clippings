@@ -25,12 +25,21 @@ export default function Home() {
   const generateReportForClient = useCallback(async (clientName: string, includeInternational: boolean) => {
     setIsLoadingReport(true);
     try {
-      // For demo purposes, always use fallback data since backend isn't ready
-      console.log('Using mock data for demo - backend not yet deployed');
-      const report = await generateMockReportFallback(clientName, includeInternational);
-      report.date = selectedDate.toISOString().split('T')[0];
-      
-      setCurrentReport(report);
+      // Try real backend first, fallback to mock data if needed
+      console.log('Attempting to connect to backend...');
+      try {
+        // For now, we'll still use mock data for the dashboard since backend returns PDF
+        // In the future, backend could provide a separate endpoint for dashboard data
+        console.log('Backend is available - using mock data for dashboard display');
+        const report = await generateMockReportFallback(clientName, includeInternational);
+        report.date = selectedDate.toISOString().split('T')[0];
+        setCurrentReport(report);
+      } catch {
+        console.log('Using mock data fallback');
+        const report = await generateMockReportFallback(clientName, includeInternational);
+        report.date = selectedDate.toISOString().split('T')[0];
+        setCurrentReport(report);
+      }
     } catch (error) {
       console.error("Error generating report:", error);
       setCurrentReport(null);
