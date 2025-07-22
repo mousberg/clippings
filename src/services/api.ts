@@ -138,7 +138,149 @@ export async function generateMockReportFallback(
 ): Promise<DailyReport> {
   // This will be removed once real API is ready
   
-  // Generate realistic mock data for any client
+  // Special case for Andy Byron - all negative Coldplay scandal coverage
+  if (clientName.toLowerCase().includes('andy byron')) {
+    const scandalArticles = [
+      {
+        id: 1001,
+        title: "Andy Byron: US tech CEO resigns after Coldplay concert embrace goes viral",
+        url: "https://bbc.co.uk/news/andy-byron-resigns",
+        outlet: "BBC",
+        tier: "Top" as const,
+        focusType: "Headline" as const,
+        estViews: 250000,
+        publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        sentiment: "negative" as const,
+        summary: "Astronomer CEO resigns after being caught on kiss cam with HR head at Coldplay concert while married.",
+        includedInReport: true,
+        screenshot: "/screenshots/bbc-scandal.png"
+      },
+      {
+        id: 1002,
+        title: "Astronomer CEO resigns after viral incident at Coldplay concert",
+        url: "https://cnn.com/tech/andy-byron-scandal",
+        outlet: "CNN",
+        tier: "Top" as const,
+        focusType: "Headline" as const,
+        estViews: 180000,
+        publishedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+        sentiment: "negative" as const,
+        summary: "Tech executive forced to step down after compromising video surfaces from concert kiss cam.",
+        includedInReport: true,
+        screenshot: "/screenshots/cnn-scandal.png"
+      },
+      {
+        id: 1003,
+        title: "Tech CEO caught with company's HR head on Coldplay kiss cam resigns",
+        url: "https://theguardian.com/andy-byron-affair",
+        outlet: "The Guardian",
+        tier: "Top" as const,
+        focusType: "Headline" as const,
+        estViews: 165000,
+        publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+        sentiment: "negative" as const,
+        summary: "Married CEO's public display with subordinate leads to immediate resignation from Astronomer.",
+        includedInReport: true,
+        screenshot: "/screenshots/guardian-scandal.png"
+      },
+      {
+        id: 1004,
+        title: "Astronomer CEO Andy Byron Resigns After Coldplay Kiss Cam Fiasco",
+        url: "https://forbes.com/andy-byron-resignation",
+        outlet: "Forbes",
+        tier: "Top" as const,
+        focusType: "Headline" as const,
+        estViews: 142000,
+        publishedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        sentiment: "negative" as const,
+        summary: "Corporate scandal unfolds as CEO's inappropriate relationship exposed at public event.",
+        includedInReport: true,
+        screenshot: "/screenshots/forbes-scandal.png"
+      },
+      {
+        id: 1005,
+        title: "'Happy family' photos of Andy Byron and wife emerge amid affair allegations",
+        url: "https://hindustantimes.com/andy-byron-family",
+        outlet: "Hindustan Times",
+        tier: "Mid" as const,
+        focusType: "Headline" as const,
+        estViews: 89000,
+        publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+        sentiment: "negative" as const,
+        summary: "Recent family photos contrast sharply with CEO's public scandal at Coldplay concert.",
+        includedInReport: true,
+        screenshot: "/screenshots/ht-scandal.png"
+      },
+      {
+        id: 1006,
+        title: "Andy Byron's wife Megan's 'statement' has gone viral as he steps down",
+        url: "https://cosmopolitan.com/andy-byron-wife-statement",
+        outlet: "Cosmopolitan",
+        tier: "Mid" as const,
+        focusType: "Headline" as const,
+        estViews: 76000,
+        publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+        sentiment: "negative" as const,
+        summary: "Wife's alleged social media response to husband's public affair goes viral online.",
+        includedInReport: true,
+        screenshot: "/screenshots/cosmo-scandal.png"
+      },
+      {
+        id: 1007,
+        title: "Ex-Astronomer CEO Andy Byron could sue Coldplay for kiss cam scandal",
+        url: "https://pagesix.com/andy-byron-lawsuit",
+        outlet: "Page Six",
+        tier: "Mid" as const,
+        focusType: "Headline" as const,
+        estViews: 65000,
+        publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
+        sentiment: "negative" as const,
+        summary: "Disgraced CEO considers legal action against band for broadcasting compromising footage.",
+        includedInReport: true,
+        screenshot: "/screenshots/pagesix-scandal.png"
+      }
+    ];
+
+    if (includeInternational) {
+      scandalArticles.push(
+        {
+          id: 1008,
+          title: "Mysterious Woman In Astronomer CEO's Coldplay Video Identified",
+          url: "https://ndtv.com/andy-byron-woman-identified",
+          outlet: "NDTV",
+          tier: "Mid" as const,
+          focusType: "Headline" as const,
+          estViews: 54000,
+          publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+          sentiment: "negative" as const,
+          summary: "International media identifies woman as company HR head in viral scandal video.",
+          includedInReport: true,
+          screenshot: "/screenshots/ndtv-scandal.png"
+        }
+      );
+    }
+
+    return {
+      clientId: 'andy-byron',
+      clientName: 'Andy Byron',
+      date: new Date().toISOString().split('T')[0],
+      articles: scandalArticles,
+      summary: {
+        topTierCount: scandalArticles.filter(a => a.tier === "Top").length,
+        midTierCount: scandalArticles.filter(a => a.tier === "Mid").length,
+        blogCount: scandalArticles.filter(a => a.tier === "Blog").length,
+        totalMentions: scandalArticles.length,
+        sentimentBreakdown: {
+          positive: 0,
+          neutral: 0,
+          negative: scandalArticles.length, // All negative
+        },
+      },
+      generatedAt: new Date().toISOString(),
+    };
+  }
+  
+  // Default case for other clients
   const outlets = includeInternational 
     ? ["BBC", "The Guardian", "The Times", "Sky News", "CNN", "Reuters", "AP", "Bloomberg", "Wall Street Journal"] 
     : ["BBC", "The Guardian", "The Times", "Sky News", "Independent"];

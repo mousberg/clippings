@@ -11,6 +11,7 @@ interface HeaderProps {
   onExportPDF: () => void;
   onSendReport: () => void;
   onLogoClick?: () => void;
+  isExportingPDF?: boolean;
 }
 
 export function Header({
@@ -19,6 +20,7 @@ export function Header({
   onExportPDF,
   onSendReport,
   onLogoClick,
+  isExportingPDF = false,
 }: Omit<HeaderProps, 'selectedClient'>) {
   return (
     <header className="border-b bg-white/80 backdrop-blur-md px-6 py-4 shadow-sm">
@@ -48,9 +50,23 @@ export function Header({
             <Plus className="h-4 w-4 mr-2" />
             New Report
           </Button>
-          <Button onClick={onExportPDF} variant="outline" size="sm">
-            <FileText className="h-4 w-4 mr-2" />
-            Export PDF
+          <Button 
+            onClick={onExportPDF} 
+            variant="outline" 
+            size="sm"
+            disabled={isExportingPDF}
+          >
+            {isExportingPDF ? (
+              <>
+                <div className="h-4 w-4 mr-2 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <FileText className="h-4 w-4 mr-2" />
+                Export PDF
+              </>
+            )}
           </Button>
           <Button onClick={onSendReport} size="sm">
             <Send className="h-4 w-4 mr-2" />

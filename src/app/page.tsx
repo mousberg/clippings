@@ -21,6 +21,8 @@ export default function Home() {
   const [isNewReportModalOpen, setIsNewReportModalOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [isLoadingReport, setIsLoadingReport] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [exportProgress, setExportProgress] = useState('');
 
   const generateReportForClient = useCallback(async (clientName: string, includeInternational: boolean) => {
     setIsLoadingReport(true);
@@ -99,14 +101,30 @@ export default function Home() {
   };
 
   const handleExportPDF = async () => {
-    if (!currentReport) return;
+    if (!currentReport || isExportingPDF) return;
     
     try {
-      setIsLoadingReport(true);
+      setIsExportingPDF(true);
+      setExportProgress('Connecting to server...');
       
       // Try the real backend first
       try {
+        setExportProgress('Fetching Google News data...');
+        
+        // Simulate progress updates since we can't get real progress from backend
+        const progressTimer = setInterval(() => {
+          setExportProgress(prev => {
+            if (prev.includes('Fetching')) return 'Analyzing articles with AI...';
+            if (prev.includes('Analyzing')) return 'Categorizing media coverage...';
+            if (prev.includes('Categorizing')) return 'Generating PDF report...';
+            return prev;
+          });
+        }, 2000);
+        
         const pdfBlob = await ApiService.generateReport(currentReport.clientName, false);
+        clearInterval(progressTimer);
+        
+        setExportProgress('Preparing download...');
         const filename = `${currentReport.clientName.toLowerCase().replace(/\s+/g, '-')}_${Date.now()}.pdf`;
         
         // Create download link
@@ -120,9 +138,11 @@ export default function Home() {
         window.URL.revokeObjectURL(url);
         
         console.log(`PDF downloaded: ${filename}`);
+        setExportProgress('');
         
       } catch (error) {
         console.error('Backend error details:', error);
+        setExportProgress('');
         // Show more detailed error for debugging
         if (error instanceof Error) {
           alert(`PDF export failed: ${error.message}\n\nPlease check the browser console (F12) for detailed error information.\n\nThe backend needs CORS headers to allow requests from ${window.location.origin}`);
@@ -133,7 +153,8 @@ export default function Home() {
       }
       
     } finally {
-      setIsLoadingReport(false);
+      setIsExportingPDF(false);
+      setExportProgress('');
     }
   };
 
@@ -206,6 +227,8 @@ export default function Home() {
       onExportPDF={handleExportPDF}
       onSendReport={handleSendReport}
       onLogoClick={handleLogoClick}
+      isExportingPDF={isExportingPDF}
+      exportProgress={exportProgress}
     >
       <div className="space-y-6">
         {/* Client and Date Selection */}
