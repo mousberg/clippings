@@ -10,6 +10,12 @@ export interface GenerateReportRequest {
   country?: string;
 }
 
+export interface AnalyticsRequest {
+  clientId: string;
+  includeInternational: boolean;
+  date: string;
+}
+
 export interface ExportPDFRequest {
   clientName: string;
   date: string;
@@ -50,6 +56,41 @@ export class ApiService {
     }
 
     return response.json();
+  }
+
+  static async getAnalytics(request: AnalyticsRequest): Promise<DailyReport> {
+    try {
+      console.log(`Calling analytics API at: ${API_BASE_URL}/analytics`);
+      console.log('Analytics request payload:', request);
+
+      const response = await fetch(`${API_BASE_URL}/analytics`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
+
+      console.log('Analytics response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Analytics API error response:', errorText);
+        throw new Error(`Analytics API Error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Analytics data received:', data);
+      
+      // The API returns { "report": { ... } } format
+      return data.report as DailyReport;
+    } catch (error) {
+      console.error('Analytics API error:', error);
+      if (error instanceof TypeError && error.message === 'Load failed') {
+        throw new Error('Network error: Cannot connect to analytics API. This is likely a CORS issue.');
+      }
+      throw error;
+    }
   }
 
   static async generateReport(clientName: string, includeInternational: boolean = false): Promise<Blob> {

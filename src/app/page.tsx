@@ -27,17 +27,21 @@ export default function Home() {
   const generateReportForClient = useCallback(async (clientName: string, includeInternational: boolean) => {
     setIsLoadingReport(true);
     try {
-      // Try real backend first, fallback to mock data if needed
-      console.log('Attempting to connect to backend...');
+      // Try real analytics API first, fallback to mock data
+      console.log('Attempting to get analytics data from backend...');
       try {
-        // For now, we'll still use mock data for the dashboard since backend returns PDF
-        // In the future, backend could provide a separate endpoint for dashboard data
-        console.log('Backend is available - using mock data for dashboard display');
-        const report = await generateMockReportFallback(clientName, includeInternational);
-        report.date = selectedDate.toISOString().split('T')[0];
+        const analyticsRequest = {
+          clientId: clientName.toLowerCase().replace(/\s+/g, '-'),
+          includeInternational: includeInternational,
+          date: selectedDate.toISOString().split('T')[0]
+        };
+        
+        const report = await ApiService.getAnalytics(analyticsRequest);
+        console.log('Using real analytics data from backend');
         setCurrentReport(report);
-      } catch {
-        console.log('Using mock data fallback');
+      } catch (error) {
+        console.log('Analytics API not available, using mock data fallback');
+        console.error('Analytics error:', error);
         const report = await generateMockReportFallback(clientName, includeInternational);
         report.date = selectedDate.toISOString().split('T')[0];
         setCurrentReport(report);
