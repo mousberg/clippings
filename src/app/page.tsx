@@ -234,11 +234,11 @@ export default function Home() {
       isExportingPDF={isExportingPDF}
       exportProgress={exportProgress}
     >
-      <div className="space-y-8">
+      <div className="space-y-4 sm:space-y-6 lg:space-y-8">
         {/* Client and Date Selection */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-zinc-200/50 shadow-sm">
-          <div className="flex items-center gap-6">
-            <div className="space-y-2">
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-zinc-200/50 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+            <div className="space-y-2 w-full sm:w-auto">
               <label className="text-sm font-medium text-zinc-600">
                 Select Client
               </label>
@@ -248,7 +248,7 @@ export default function Home() {
                 clients={mockClients}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 w-full sm:w-auto">
               <label className="text-sm font-medium text-zinc-600">
                 Report Date
               </label>
@@ -270,9 +270,9 @@ export default function Home() {
 
         {/* Main Content Grid */}
         {currentReport && (
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Coverage Feed - Takes 2 columns on XL screens */}
-            <div className="xl:col-span-2">
+            <div className="xl:col-span-2 order-2 xl:order-1">
               <CoverageFeedTable
                 articles={currentReport.articles}
                 onToggleInclude={handleToggleArticleInclude}
@@ -285,7 +285,7 @@ export default function Home() {
             </div>
 
             {/* Report Preview Panel - Takes 1 column on XL screens */}
-            <div className="xl:col-span-1">
+            <div className="xl:col-span-1 order-1 xl:order-2">
               <ReportPreviewPanel
                 report={currentReport}
                 onExportPDF={handleExportPDF}

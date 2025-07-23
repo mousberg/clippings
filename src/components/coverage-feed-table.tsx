@@ -1,17 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { 
   ExternalLink, 
   Check, 
@@ -148,98 +137,98 @@ export function CoverageFeedTable({
         <table className="w-full">
           <thead className="border-b border-zinc-200/50">
             <tr>
-              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600">Tier</th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600 w-16">Preview</th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600 min-w-[300px]">Headline</th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600">Focus</th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600">
+              <th className="text-left py-2 px-4 text-xs font-medium text-zinc-600">Tier</th>
+              <th className="text-left py-2 px-4 text-xs font-medium text-zinc-600 w-12"></th>
+              <th className="text-left py-2 px-4 text-xs font-medium text-zinc-600 min-w-[200px]">Headline</th>
+              <th className="text-left py-2 px-4 text-xs font-medium text-zinc-600 hidden md:table-cell">Focus</th>
+              <th className="text-left py-2 px-4 text-xs font-medium text-zinc-600">
                 <button
                   className="flex items-center gap-1 hover:text-zinc-900 transition-colors"
                   onClick={() => handleSort("outlet")}
                 >
                   Source
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-zinc-600">
+              <th className="text-left py-2 px-4 text-xs font-medium text-zinc-600 hidden lg:table-cell">
                 <button
                   className="flex items-center gap-1 hover:text-zinc-900 transition-colors"
                   onClick={() => handleSort("views")}
                 >
-                  Est. Views
-                  <ArrowUpDown className="h-4 w-4" />
+                  Views
+                  <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
-              <th className="text-center py-3 px-6 text-sm font-medium text-zinc-600">Action</th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-zinc-600">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200/50">
             {filteredAndSortedArticles.map((article) => (
               <tr key={article.id} className="hover:bg-zinc-50/50 transition-colors group">
-                <td className="py-4 px-6">
-                  <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${getTierColor(article.tier)}`}>
+                <td className="py-2.5 px-4">
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getTierColor(article.tier)}`}>
                     {getTierIcon(article.tier)}
                     {article.tier}
                   </span>
                 </td>
                 
-                <td className="py-4 px-6">
+                <td className="py-2.5 px-4">
                   {article.screenshot ? (
                     <button
                       className="group-hover:scale-105 transition-transform duration-200"
                       onClick={() => onViewScreenshot?.(article)}
                     >
-                      <div className="w-10 h-10 bg-zinc-100 rounded-lg border border-zinc-200 flex items-center justify-center hover:bg-zinc-200 transition-colors">
-                        <ImageIcon className="h-4 w-4 text-zinc-500" />
+                      <div className="w-8 h-8 bg-zinc-100 rounded border border-zinc-200 flex items-center justify-center hover:bg-zinc-200 transition-colors">
+                        <ImageIcon className="h-3 w-3 text-zinc-500" />
                       </div>
                     </button>
                   ) : (
-                    <div className="w-10 h-10 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-center">
+                    <div className="w-8 h-8 bg-zinc-50 rounded border border-zinc-200 flex items-center justify-center">
                       <ImageIcon className="h-3 w-3 text-zinc-400" />
                     </div>
                   )}
                 </td>
                 
-                <td className="py-4 px-6">
-                  <div className="space-y-2">
-                    <div className="font-medium text-zinc-900 truncate pr-2 group-hover:text-zinc-700 transition-colors" title={article.title}>
+                <td className="py-2.5 px-4">
+                  <div className="space-y-1">
+                    <div className="font-medium text-sm text-zinc-900 truncate pr-2 group-hover:text-zinc-700 transition-colors" title={article.title}>
                       {article.title}
                     </div>
-                    <div className="text-sm text-zinc-600 line-clamp-2 leading-relaxed">
+                    <div className="text-xs text-zinc-600 line-clamp-1">
                       {article.summary}
                     </div>
                     <button
                       className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-700 transition-colors"
                       onClick={() => window.open(article.url, '_blank')}
                     >
-                      <ExternalLink className="h-3 w-3" />
-                      View Article
+                      <ExternalLink className="h-2.5 w-2.5" />
+                      View
                     </button>
                   </div>
                 </td>
                 
-                <td className="py-4 px-6">
-                  <div className={`text-sm font-medium ${getFocusTypeColor(article.focusType)} flex items-center gap-1`}>
-                    <div className={`w-2 h-2 rounded-full ${article.focusType === "Headline" ? "bg-green-500" : "bg-zinc-400"}`}></div>
+                <td className="py-2.5 px-4 hidden md:table-cell">
+                  <div className={`text-xs font-medium ${getFocusTypeColor(article.focusType)} flex items-center gap-1`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${article.focusType === "Headline" ? "bg-green-500" : "bg-zinc-400"}`}></div>
                     {article.focusType}
                   </div>
                 </td>
                 
-                <td className="py-4 px-6">
-                  <div className="font-medium text-zinc-900">{article.outlet}</div>
-                  <div className="text-sm text-zinc-500">
-                    {new Date(article.publishedAt).toLocaleDateString('en-US')}
+                <td className="py-2.5 px-4">
+                  <div className="font-medium text-sm text-zinc-900">{article.outlet}</div>
+                  <div className="text-xs text-zinc-500">
+                    {new Date(article.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </div>
                 </td>
                 
-                <td className="py-4 px-6">
-                  <div className="font-semibold text-zinc-900">{formatViews(article.estViews)}</div>
+                <td className="py-2.5 px-4 hidden lg:table-cell">
+                  <div className="font-semibold text-sm text-zinc-900">{formatViews(article.estViews)}</div>
                 </td>
                 
-                <td className="py-4 px-6 text-center">
+                <td className="py-2.5 px-4 text-center">
                   <button
                     onClick={() => onToggleInclude(article.id, !article.includedInReport)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all duration-200 ${
                       article.includedInReport 
                         ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100" 
                         : "bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100"
@@ -248,12 +237,12 @@ export function CoverageFeedTable({
                     {article.includedInReport ? (
                       <>
                         <Check className="h-3 w-3" />
-                        Included
+                        <span className="hidden sm:inline">Included</span>
                       </>
                     ) : (
                       <>
                         <X className="h-3 w-3" />
-                        Add to Report
+                        <span className="hidden sm:inline">Add</span>
                       </>
                     )}
                   </button>

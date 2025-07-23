@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -98,15 +96,13 @@ export function ReportPreviewPanel({
         </div>
       </div>
       
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-auto p-1 text-xs text-blue-600 hover:text-blue-800"
+      <button
+        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors"
         onClick={() => window.open(article.url, '_blank')}
       >
-        <ExternalLink className="h-3 w-3 mr-1" />
+        <ExternalLink className="h-3 w-3" />
         View Source
-      </Button>
+      </button>
     </div>
   );
 
