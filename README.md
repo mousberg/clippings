@@ -7,9 +7,16 @@
 
 Real-time PR coverage analysis using Google News RSS feeds and Google Gemini AI
 
-[Live Demo](https://getclippings.co) • [Try PDF Export](#-quick-start)
+[Live Demo](https://getclippings.co)
 
 </div>
+
+---
+
+## 🎥 Demo
+
+https://github.com/user-attachments/assets/9babd68c-4985-4e09-997f-24d80895e3cf
+
 
 ---
 
